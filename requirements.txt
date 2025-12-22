@@ -1,0 +1,12 @@
+streamlit
+langchain
+langchain-openai
+langgraph
+langchain-community
+langchain-text-splitters
+langgraph-checkpoint-sqlite
+qdrant-client
+llama-parse
+pydantic
+python-dotenv
+tiktoken
