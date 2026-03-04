@@ -16,8 +16,6 @@ from langchain_core.messages import (
 )
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-# from langchain_qdrant.qdrant import RetrievalMode
-# from langchain_qdrant import QdrantVectorStore
 from pydantic import BaseModel, Field
 from typing import Literal, Any, Type, Optional
 # Docker aplana la estructura app.py, por lo que no tiene sentido hacer 'from .. import prompts'
@@ -37,6 +35,8 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 qdrant_api_key = os.getenv('QDRANT_API_KEY')
 qdrant_url = os.getenv('QDRANT_URL')
 collection_name = os.getenv('QDRANT_COLLECTION_NAME')
+embedding_model_name = os.getenv('EMBEDDING_MODEL_NAME')
+llm_model_name = os.getenv('LLM_MODEL_NAME')
 
 if not openai_api_key or not qdrant_api_key:
     log.error("Error: Faltan API KEYS en el archivo .env")
@@ -44,8 +44,8 @@ if not openai_api_key or not qdrant_api_key:
 # ======================
 #       CLIENTES
 # ======================
-embedding = OpenAIEmbeddings(model = 'text-embedding-3-small')
-modelo_llm = 'gpt-5-nano' 
+embedding = OpenAIEmbeddings(model = embedding_model_name)
+modelo_llm = llm_model_name
 llm = ChatOpenAI(
     model = modelo_llm, 
     temperature = 0
@@ -148,7 +148,7 @@ class QdrantRetrieverTool(BaseTool):
                 collection_name = collection_name,
                 query = query_vector,
                 query_filter = models.Filter(must = conditions) if conditions else None,
-                limit = 8,
+                limit = 5,
                 score_threshold = 0.5,
                 with_payload = True
             )
@@ -284,7 +284,7 @@ def tool_call_node(state: AgentState):
     last_message = state['messages'][-1]
     tool_messages = []
     
-    # Qué obtenga el atributo 'tool_calls' de last_message, sino, '[]'
+    # Qué obtenga el atributo 'tool_calls' de last_message, sino '[]'
     if not hasattr(last_message, 'tool_calls') or not last_message.tool_calls:
         log.warning("    El último mensaje no tiene tool_calls. Saltando...")
         return {'messages': []}
@@ -377,7 +377,6 @@ def final_node(state: AgentState):
 # ======================
 #   FUNCIONES DE RUTEO
 # ======================
-
 def grade_documents(state: AgentState) -> Literal['generate_response_node', 'rewrite_node']:
     """
     Determines whether the retrieved documents are relevant to the question.
@@ -399,7 +398,7 @@ def grade_documents(state: AgentState) -> Literal['generate_response_node', 'rew
         return 'rewrite_node'
     
     try:
-        log.info(f"    Documentos recuperados: {docs_content}")
+        log.info(f"    Se recuperaron documentos")
     except Exception as e:
         log.info(f"    No se recuperaron documentos: {e}")
 
@@ -437,7 +436,7 @@ def should_continue(state: AgentState):
     else:
         return 'agent_node'
 
-def custom_agent_router(state: AgentState):
+def custom_agent_router(state: AgentState) -> Literal['max_retries_node', 'tool_call_node', 'final_node']:
     """
     1. Checks if the retries were exceeded.
     2. Checks if there are any tool_calls.
