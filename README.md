@@ -1,11 +1,11 @@
 # Asistente Técnico Post-Venta con Arquitectura RAG Multimodal
 
-**Autor:** Francisco Reveco
+**Autor:** Francisco Reveco  
 **Carrera:** Ingeniería Civil Industrial  
-**Universidad:** Universidad Mayor 
+**Universidad:** Universidad Mayor  
 **Año:** 2026  
 
-Repositorio asociado a la tesis de pregrado orientada al diseño e implementación de un agente conversacional multimodal basado en Retrieval-Augmented Generation (RAG) para automatización de soporte técnico post-venta en e-commerce de productos electrónicos.
+Repositorio asociado a la tesis de pregrado orientada al diseño e implementación de un agente conversacional multimodal basado en Retrieval-Augmented Generation (RAG) para automatización de soporte técnico postventa en e-commerce de productos electrónicos.
 
 ---
 
@@ -85,12 +85,11 @@ El sistema incorpora:
 - Python 3.9
 - Docker (opcional pero recomendado)
 - Cuenta OpenAI activa
-- Instancia activa de Qdrant (local o cloud)
+- Instancia activa de Qdrant (cloud)
 
 ### 5.2 Dependencias Python
 
-Se encuentran en `requirements.txt`.  
-Para mayor reproducibilidad, se recomienda fijar versiones específicas antes de publicación final de tesis.
+Se encuentran en `requirements.txt`.
 
 ---
 
@@ -103,9 +102,11 @@ OPENAI_API_KEY=
 QDRANT_URL=
 QDRANT_API_KEY=
 QDRANT_COLLECTION_NAME=manuales_tecnicos
+EMBEDDING_MODEL_NAME=text-embedding-3-small
+LLM_MODEL_NAME=gpt-5-nano
 ```
 
-El sistema no inicia correctamente si faltan las credenciales.
+El sistema no inicia correctamente si faltan las credenciales. Se pueden modificar los modelos escogidos.
 
 ---
 
